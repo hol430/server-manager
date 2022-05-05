@@ -1,0 +1,12 @@
+version: '3.1'
+
+services:
+  server-manager:
+    build:
+      context: .
+    container_name: server-manager
+    restart: unless-stopped
+    ports:
+      - 80
+      - 443
+      - 27746
