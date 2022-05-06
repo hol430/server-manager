@@ -10,12 +10,12 @@ public class IndexModel : PageModel
     /// <summary>
     /// Logging service.
     /// </summary>
-    private readonly ILogger<IndexModel> logger;
+    protected readonly ILogger<IndexModel> logger;
 
     /// <summary>
     /// The controller.
     /// </summary>
-    private readonly ServerController controller;
+    protected readonly ServerController controller;
 
     /// <summary>
     /// The raw inputs provided by the user.
@@ -47,7 +47,7 @@ public class IndexModel : PageModel
     /// <summary>
     /// Handler for submit button click.
     /// </summary>
-    public async Task SubmitAsync()
+    public virtual async Task SubmitAsync()
     {
         if (!ModelState.IsValid)
             throw new InvalidOperationException($"Invalid model state: {ModelState}");

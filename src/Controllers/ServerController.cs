@@ -52,16 +52,31 @@ public class ServerController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Upload a new .met file.
+    /// </summary>
+    /// <param name="upload">The .met file.</param>
+    [HttpPost("uploadmet")]
+    public async Task UploadMetFileAsync([FromForm] IFormFile upload)
+    {
+        string outFileName = Path.Combine(FileOutputPath(), upload.FileName);
+        using (FileStream outFile = System.IO.File.OpenWrite(outFileName))
+            using (Stream inFile = upload.OpenReadStream())
+                await inFile.CopyToAsync(outFile);
+    }
+
     private string GetTempFileName()
     {
         const uint maxTries = 10_000;
         for (uint i = 0; i < maxTries; i++)
         {
             string fileName = $"apsim-input-file-{Guid.NewGuid()}.apsimx";
-            string file = Path.Combine(Path.GetTempPath(), fileName);
+            string file = Path.Combine(FileOutputPath(), fileName);
             if (!System.IO.File.Exists(file))
                 return file;
         }
         throw new InvalidOperationException($"Unable to generate a unique random filename");
     }
+
+    private string FileOutputPath() => Path.GetTempPath();
 }

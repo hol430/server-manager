@@ -13,7 +13,7 @@ public class Inputs
     /// The uploaded .apsimx file.
     /// </summary>
     [Required]
-    [Display(Name = ".apsimx file")]
+    [Display(Name = "Input file")]
     [MaxFileSize(30 * Units.Megabyte)]
     public IFormFile? UploadedFile { get; set; }
 }
