@@ -13,5 +13,6 @@ RUN dotnet publish --nologo -c Release -r linux-x64 --self-contained /ServerMana
 FROM apsiminitiative/apsimng-server:latest
 COPY --from=build /ServerManager/src/bin/Release/net6.0/linux-x64/publish /opt/server-manager/
 ENV PATH $PATH:/opt/server-manager
+WORKDIR /opt/server-manager
 ENTRYPOINT ["server-manager"]
 
