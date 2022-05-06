@@ -12,3 +12,6 @@ services:
       - 27746:27746
     volumes:
       - /data/certs:/etc/ssl/certs/cropgen
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=
