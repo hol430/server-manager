@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using ServerManager.Utility;
 
 namespace ServerManager.Controllers;
 
@@ -19,9 +20,14 @@ public class ServerController : ControllerBase
     /// </summary>
     private static ServerInstance? server = null;
 
+    /// <summary>
+    /// Data directory, to which input .apsimx/.met files will be saved.
+    /// </summary>
+    private const string dataDirectoryVariable = "DATA_DIR";
+
     // ~ServerController()
     // {
-    //     // Stop any running servers.
+    //     // Stop any running apsim servers.
     //     if (server != null)
     //         server.Stop();
     // }
@@ -65,18 +71,31 @@ public class ServerController : ControllerBase
                 await inFile.CopyToAsync(outFile);
     }
 
+    /// <summary>
+    /// Get a unique filename for an uploaded .apsimx file.
+    /// </summary>
     private string GetTempFileName()
     {
         const uint maxTries = 10_000;
+        string outputPath = FileOutputPath();
         for (uint i = 0; i < maxTries; i++)
         {
             string fileName = $"apsim-input-file-{Guid.NewGuid()}.apsimx";
-            string file = Path.Combine(FileOutputPath(), fileName);
+            string file = Path.Combine(outputPath, fileName);
             if (!System.IO.File.Exists(file))
                 return file;
         }
         throw new InvalidOperationException($"Unable to generate a unique random filename");
     }
 
-    private string FileOutputPath() => Path.GetTempPath();
+    /// <summary>
+    /// Get the path to which uploaded files will be saved.
+    /// </summary>
+    private string FileOutputPath()
+    {
+        string directory = EnvironmentVariable.Read(dataDirectoryVariable);
+        if (!Directory.Exists(directory))
+            throw new DirectoryNotFoundException($"Unable to write files to output directory '{directory}': directory does not exist");
+        return directory;
+    }
 }

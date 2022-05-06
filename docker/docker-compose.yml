@@ -12,6 +12,8 @@ services:
       - 27746:27746
     volumes:
       - /data/certs:/etc/ssl/certs/cropgen
+      - /data/uploads:/uploads
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=
+      - DATA_DIR=/uploads
