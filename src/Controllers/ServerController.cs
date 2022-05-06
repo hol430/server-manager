@@ -6,6 +6,9 @@ namespace ServerManager.Controllers;
 /// <summary>
 /// Controller for Fast APSIM Runner Tool (Server - aka apsim server) instances.
 /// </summary>
+/// <remarks>
+/// Should be threadsafe.
+/// </remarks>
 [Route("api/server")]
 [ApiController]
 public class ServerController : ControllerBase
@@ -24,6 +27,35 @@ public class ServerController : ControllerBase
     /// Data directory, to which input .apsimx/.met files will be saved.
     /// </summary>
     private const string dataDirectoryVariable = "DATA_DIR";
+
+    /// <summary>
+    /// Lock file to which the name of the previously running server will be
+    /// written. This may be used to resume where we left off.
+    /// </summary>
+    private const string lockFileName = "server-manager.lock";
+
+    /// <summary>
+    /// When first started, attempt to start an apsim server for the previously-
+    /// running .apsimx file, if any exists.
+    /// </summary>
+    public ServerController()
+    {
+        string lockFile = GetLockFileName();
+        if (System.IO.File.Exists(lockFile))
+        {
+            lock(mutex)
+            {
+                string previousFileName = System.IO.File.ReadAllText(lockFile);
+                if (System.IO.File.Exists(previousFileName))
+                {
+                    if (server != null)
+                        server.Stop();
+                    server = new ServerInstance(previousFileName);
+                    server.Start();
+                }
+            }
+        }
+    }
 
     // ~ServerController()
     // {
@@ -55,6 +87,9 @@ public class ServerController : ControllerBase
             }
             server = new ServerInstance(filePath);
             server.Start();
+
+            // Write the lock file so we can resume if restarted.
+            System.IO.File.WriteAllText(GetLockFileName(), filePath);
         }
     }
 
@@ -98,4 +133,9 @@ public class ServerController : ControllerBase
             throw new DirectoryNotFoundException($"Unable to write files to output directory '{directory}': directory does not exist");
         return directory;
     }
+
+    /// <summary>
+    /// Get the path to the .lock file.
+    /// </summary>
+    private string GetLockFileName() => Path.Combine(FileOutputPath(), lockFileName);
 }

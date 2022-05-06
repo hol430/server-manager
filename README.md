@@ -10,6 +10,8 @@ The apsim server could be refactored to support cancellation, in which case we c
 
 Should also write some unit tests for this at some point. There's not much code at the moment, but that means that writing tests shouldn't be much work!
 
+Need to think about authentication.
+
 ## Deployment
 
 The repository contains a dockerfile and docker-compose file. To deploy the website, login to the production server, clone/navigate to this repository, and run:
