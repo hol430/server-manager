@@ -7,8 +7,8 @@ services:
     container_name: server-manager
     restart: unless-stopped
     ports:
-      - 80
-      - 443
-      - 27746
+      - 80:80
+      - 443:443
+      - 27746:27746
     volumes:
       - /data/certs:/etc/ssl/certs/cropgen
