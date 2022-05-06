@@ -7,7 +7,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0 as build
 RUN git clone https://github.com/hol430/server-manager /ServerManager
 WORKDIR /ServerManager
-RUN dotnet publish --nologo -c Release -r linux-x64 /ServerManager/src/ServerManager.csproj
+RUN dotnet publish --nologo -c Release -r linux-x64 --self-contained /ServerManager/src/ServerManager.csproj
 
 # Main image from apsimng-server
 FROM apsiminitiative/apsimng-server:latest
