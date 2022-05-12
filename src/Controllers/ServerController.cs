@@ -24,6 +24,11 @@ public class ServerController : ControllerBase
     private static ServerInstance? server = null;
 
     /// <summary>
+    /// Logging instance used by apsim servers.
+    /// </summary>
+    private readonly ILogger<ServerInstance> serverLogger;
+
+    /// <summary>
     /// Data directory, to which input .apsimx/.met files will be saved.
     /// </summary>
     private const string dataDirectoryVariable = "DATA_DIR";
@@ -38,8 +43,10 @@ public class ServerController : ControllerBase
     /// When first started, attempt to start an apsim server for the previously-
     /// running .apsimx file, if any exists.
     /// </summary>
-    public ServerController()
+    public ServerController(ILogger<ServerInstance> logger)
     {
+        serverLogger = logger;
+
         string lockFile = GetLockFileName();
         if (System.IO.File.Exists(lockFile))
         {
@@ -50,7 +57,7 @@ public class ServerController : ControllerBase
                 {
                     if (server != null)
                         server.Stop();
-                    server = new ServerInstance(previousFileName);
+                    server = new ServerInstance(previousFileName, serverLogger);
                     server.Start();
                 }
             }
@@ -85,7 +92,7 @@ public class ServerController : ControllerBase
                 server.Stop();
                 server = null;
             }
-            server = new ServerInstance(filePath);
+            server = new ServerInstance(filePath, serverLogger);
             server.Start();
 
             // Write the lock file so we can resume if restarted.

@@ -13,12 +13,17 @@ public class ServerInstance
     /// <summary>
     /// Path to the old .apsimx file.
     /// </summary>
-    private string filePath;
+    private readonly string filePath;
 
     /// <summary>
     /// The apsim server intance.
     /// </summary>
     private Process? serverProcess;
+
+    /// <summary>
+    /// Logging service.
+    /// </summary>
+    private readonly ILogger<ServerInstance> logger;
 
     /// <summary>
     /// Is the server running/listening?
@@ -29,9 +34,10 @@ public class ServerInstance
     /// Create a new <see cref="ServerInstance"/> instanace.
     /// </summary>
     /// <param name="file">The .apsimx file to be run.</param>
-    public ServerInstance(string file)
+    public ServerInstance(string file, ILogger<ServerInstance> logger)
     {
         filePath = file;
+        this.logger = logger;
     }
 
     /// <summary>
@@ -52,6 +58,8 @@ public class ServerInstance
         process.OutputDataReceived += OnServerOutputWritten;
         process.ErrorDataReceived += OnServerErrorWritten;
         process.Start();
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
         serverProcess = process;
     }
 
@@ -83,7 +91,7 @@ public class ServerInstance
     /// <param name="e">Event data.</param>
     private void OnServerErrorWritten(object sender, DataReceivedEventArgs e)
     {
-        Console.WriteLine(e.Data);
+        logger.LogInformation(e.Data);
     }
 
     /// <summary>
@@ -93,6 +101,6 @@ public class ServerInstance
     /// <param name="e">Event data.</param>
     private void OnServerOutputWritten(object sender, DataReceivedEventArgs e)
     {
-        Console.Error.WriteLine(e.Data);
+        logger.LogError(e.Data);
     }
 }

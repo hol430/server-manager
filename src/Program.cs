@@ -11,7 +11,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton(new ServerController());
+builder.Services.AddSingleton<ServerController>();
 
 var app = builder.Build();
 
